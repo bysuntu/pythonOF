@@ -1,2 +1,2 @@
 # pythonOF
-understanding openfoam
+understanding incompressible unsteady NS with PISO
