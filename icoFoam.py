@@ -95,6 +95,9 @@ while curT < float(control.endT):
         fvm = FVM(field, 'UEqn')
         fvc = FVC(field, 'UEqn')
 
+    print(field.faces)
+    sys.exit()
+
     # Solve Navier-Stokes Equation for velocity
     fvm.solve(fvm.dudt() + fvm.div('phi, U') - fvm.laplacian(nu, 'U', limitCoeff) == -fvc.grad('P'))
     # PISO
