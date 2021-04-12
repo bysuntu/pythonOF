@@ -12,6 +12,7 @@ class ofMatrix:
         self.neighbour = field.neighbour
         self.owner = field.owner
         self.dim = dim
+        self.refPressure = False
         self.construction()
         
     def construction(self):
@@ -114,9 +115,11 @@ class ofMatrix:
     def setReference(self, pRefCell, pRefValue):
         self.pRefCell = pRefCell
         self.pRefValue = pRefValue
+        self.refPressure = True
 
         
-    def solve(self, nsMatrix):
+    def solve(self, equation):
+        nsMatrix, fvcSource = equation
         self.lowerV = nsMatrix.lowerV
         self.upperV = nsMatrix.upperV
         self.diagV = nsMatrix.diagV
@@ -124,12 +127,11 @@ class ofMatrix:
         self.internalCoeffs = nsMatrix.internalCoeffs
         self.boundaryCoeffs = nsMatrix.boundaryCoeffs
 
-        # For pressure reference
-        try:
+        if self.refPressure:
+            # For pressure reference
             self.source[self.pRefCell] += self.diagV[self.pRefCell] * self.pRefValue
             self.diagV[self.pRefCell] += self.diagV[self.pRefCell]
-        except AttributeError:
-            pass
+
         
         nC = self.field.nCells
         d = np.arange(nC).reshape(nC, 1)
@@ -150,7 +152,9 @@ class ofMatrix:
                 b[self.field.owner[start_:start_ + range_], k] += self.boundaryCoeffs[name_][:, k]
 
             v = np.concatenate((self.upperV, diagV_, self.lowerV), axis = 0).flatten()
+
         Mk = coo_matrix((v, (r, c)), shape = (nC, nC))
+        b += fvcSource * self.field.V
         
         if self.name == 'UEqn':
             self.field.UOldTime.c = self.field.U.c

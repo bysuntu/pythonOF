@@ -15,21 +15,24 @@ class PISO:
         self.pisoLoop(NS)
 
     def pisoLoop(self, NS):
-        A = NS.A()
-        H = NS.H()
+        for _ in range(self.nCorrectors):
+            A = NS.A()
+            H = NS.H()
 
-        rAU = A.inv()
-        HbyA = rAU * H
+            rAU = A.inv()
+            HbyA = rAU * H
 
-        self.constrainHbyA(HbyA.b, NS.field.U.b, NS.field.P.b)
+            self.constrainHbyA(HbyA.b, NS.field.U.b, NS.field.P.b)
+            phiHbyA = self.calPhiHbyA(NS.field, A, rAU, HbyA)
 
-        phiHbyA = self.calPhiHbyA(NS.field, A, rAU, HbyA)
+            self.adjustPhi()
+            self.constrainPressure()
 
-        self.adjustPhi()
-        self.constrainPressure()
+            for k in range(self.nNonOrthogonalCorrectors + 1):
+                pGrad = self.nonOrthogonalLoop(rAU, phiHbyA, k == self.nNonOrthogonalCorrectors)
 
-        for k in range(self.nNonOrthogonalCorrectors + 1):
-            self.nonOrthogonalLoop(rAU, phiHbyA, k == self.nNonOrthogonalCorrectors)
+            pCorr = rAU.c * pGrad
+            self.field.U.c = HbyA.c - pCorr
 
 
     def nonOrthogonalLoop(self, rAU, phiHbyA, finalNonOrthogonal):
@@ -44,6 +47,9 @@ class PISO:
         if finalNonOrthogonal:
             print('NonOrthogonal Final')
             fvm.field.phi = phiHbyA - fvm.flux()
+            return fvc.grad('P')
+        else:
+            return None
 
     def adjustPhi(self):
         pass

@@ -112,6 +112,6 @@ class matrixData:
 
 
     def __eq__(self, source):
-        self.source += source
-        return self
+        
+        return self, source
 

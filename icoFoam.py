@@ -40,7 +40,7 @@ class GUI:
         entry_st.place(x=155, y = 70)
 
         var_et = tk.StringVar()
-        var_et.set('1')
+        var_et.set('0.02')
         entry_et = tk.Entry(window, textvariable = var_et, font=('Arial', 12))
         entry_et.place(x=155, y = 100)
 
@@ -94,9 +94,8 @@ while curT < float(control.endT):
         field = ofField(os.path.join(control.path, meshDir), os.path.join(control.path, control.startT), float(control.stepT))
         fvm = FVM(field, 'UEqn')
         fvc = FVC(field, 'UEqn')
-
-    print(field.faces)
-    sys.exit()
+        curT += float(control.stepT)
+        continue
 
     # Solve Navier-Stokes Equation for velocity
     fvm.solve(fvm.dudt() + fvm.div('phi, U') - fvm.laplacian(nu, 'U', limitCoeff) == -fvc.grad('P'))

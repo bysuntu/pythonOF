@@ -83,7 +83,7 @@ class FVM(ofMatrix): # Finite Volume Method
         rDeltaT = 1. / self.dt
         # Lower Upper Dia Source InternalCoeffs BoundaryCoeffs
         # Also, this serves as the initialization of matrix
-        lowerV= 0
+        lowerV = 0
         upperV = 0
         diagV = rDeltaT * self.field.V
         source = rDeltaT * self.field.U.c * self.field.V
