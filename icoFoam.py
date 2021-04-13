@@ -88,7 +88,7 @@ nu = control.nu
 
 # Time Loop
 curT = float(control.startT)
-while curT < float(control.endT):
+while curT <= float(control.endT):
     print('Current Time: {:0.04f}s'.format(curT))
     if curT == float(control.startT): # Load initial values from files
         field = ofField(os.path.join(control.path, meshDir), os.path.join(control.path, control.startT), float(control.stepT))
@@ -101,6 +101,9 @@ while curT < float(control.endT):
     fvm.solve(fvm.dudt() + fvm.div('phi, U') - fvm.laplacian(nu, 'U', limitCoeff) == -fvc.grad('P'))
     # PISO
     PISO(fvm, nCorrectors, nNonOrthogonalCorrectors, limitCoeff)
+
+    if curT == float(control.endT):
+        field.writeField(curT)
 
     field.updateField()
     curT += float(control.stepT)

@@ -1,6 +1,6 @@
 import os
 import numpy as np
-from ofIO import readFieldScalar, readFieldVector
+from ofIO import readFieldScalar, readFieldVector, writeIOField
 from ofMesh import ofMesh
 from ofDataStructure import cellData
 
@@ -8,6 +8,7 @@ from ofDataStructure import cellData
 class ofField(ofMesh):
     def __init__(self, meshDir, timeDir, dt = 0):
         super().__init__(meshDir)
+        self.caseDir = os.path.split(meshDir)[0]
         self.dt = dt
         self.loadField(timeDir)
         self.updateField()
@@ -66,6 +67,7 @@ class ofField(ofMesh):
                 print('Unknown boundary condition', name_, bU[name_]['type'])
         return phi
 
+
     def dotInterpolation(self, cellValue, internalSurfaceVector = None, faceValue = None):
         owner = self.owner
         neighbour = self.neighbour
@@ -86,3 +88,13 @@ class ofField(ofMesh):
             faceValue[:nIF] = svF
         else:
             raise TypeError("The input vector shape is not allowed")
+
+
+    def writeField(self, curT):
+        print(self.U.c)
+        print(self.P.c)
+        writeIOField(self.caseDir, self.U, curT, 'volVectorField', 'U')
+        writeIOField(self.caseDir, self.P, curT, 'volScalarField', 'p')
+
+    def displayField(self):
+        return
