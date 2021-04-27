@@ -61,6 +61,9 @@ class ofField(ofMesh):
             if bU[name_]['type'] == 'fixedValue' or bU[name_]['type'] == 'extrapolatedCalculated':
                 u_ = bU[name_]['value']
                 phi[start_:start_ + range_, 0] = np.sum(sF_ * u_, axis = 1)
+            elif bU[name_]['type'] == 'noSlip':
+                u_ = np.zeros(3)
+                phi[start_:start_ + range_, 0] = np.sum(sF_ * u_, axis = 1)
             elif bU[name_]['type'] == 'empty':
                 pass
             else:

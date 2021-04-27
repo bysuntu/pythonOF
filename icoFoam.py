@@ -102,11 +102,12 @@ while curT <= float(control.endT):
     # PISO
     PISO(fvm, nCorrectors, nNonOrthogonalCorrectors, limitCoeff)
 
-    if curT == float(control.endT):
+    if curT == round(float(control.endT), 4):
         field.writeField(curT)
 
     field.updateField()
     curT += float(control.stepT)
+    curT = round(curT, 4)
 
 
 

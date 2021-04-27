@@ -226,6 +226,9 @@ class FVM(ofMatrix): # Finite Volume Method
                 svF[start_:start_ + range_] = bValue[name_]['value']
             elif bValue[name_]['type'] == 'zeroGradient':
                 svF[start_:start_ + range_] = cValue[self.owner[start_:start_ + range_]]
+            elif bValue[name_]['type'] == 'noSlip':
+                self.field.U.b[name_]['value'] = np.zeros(3)
+                svF[start_:start_ + range_] = 0
             else:
                 raise TypeError("{} for {} is not defined!".format(name_, bValue[name_]['type']))
         
@@ -241,7 +244,7 @@ class FVM(ofMatrix): # Finite Volume Method
             name_, type_, range_, start_ = bc
             if bValue[name_]['type'] == 'empty':
                 bGrad[name_] = {'type': 'empty'}
-            elif bValue[name_]['type'] == 'fixedValue':
+            elif bValue[name_]['type'] in ['fixedValue', 'noSlip']:
                 bGrad[name_] = {'type': 'extrapolatedCalculated', 'value':cGrad[self.owner[start_:start_ + range_]]}
             elif bValue[name_]['type'] == 'zeroGradient':
                 nF = np.copy(self.field.sF[start_:start_ + range_])
@@ -280,7 +283,7 @@ class FVM(ofMatrix): # Finite Volume Method
             name_, type_, range_, start_ = bc
             if bValue[name_]['type'] == 'empty':
                 continue
-            elif bValue[name_]['type'] == 'fixedValue':
+            elif bValue[name_]['type'] in ['fixedValue', 'noSlip']:
                 curRange = np.arange(start_, start_ + range_)
                 dV = bValue[name_]['value'] - cValue[self.owner[curRange]]
                 ssf[curRange] = self.field.nonOrthDeltaCoeffs[curRange] * dV

@@ -249,9 +249,9 @@ def readFieldScalar(pFileName, nCells, nInternalFaces):
             if readBoundary and line.find('}') == 0:
                 break
         try:
-            return np.reshape(p, (nCells, 1)), BC
+            return np.reshape(np.array(p), (nCells, 1)), BC
         except ValueError:
-            return np.reshape(p, (nInternalFaces, 1)), BC
+            return np.reshape(np.array(p), (nInternalFaces, 1)), BC
 
 
 def writeIOField(caseDir, fieldData, curT, classStr, objectStr):
